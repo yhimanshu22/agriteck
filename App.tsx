@@ -8,6 +8,7 @@ import { Testimonials } from './components/Testimonials';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import type { Product, Testimonial } from './types';
+import { useAuth } from './auth';
 
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([
@@ -15,14 +16,16 @@ const App: React.FC = () => {
       id: 1,
       name: 'Premium Basmati Rice',
       description: 'Long-grain aromatic rice, perfect for biryani and pulao. Aged for 12 months for extra flavor.',
-      price: '$15 / 5kg',
+      price: 15,
+      priceUnit: '5kg',
       imageUrl: 'https://picsum.photos/seed/rice/600/400',
     },
     {
       id: 2,
       name: 'Organic Whole Wheat',
       description: 'Stone-ground whole wheat grain, rich in fiber and nutrients. Ideal for healthy rotis and bread.',
-      price: '$10 / 5kg',
+      price: 10,
+      priceUnit: '5kg',
       imageUrl: 'https://picsum.photos/seed/wheat/600/400',
     },
   ]);
@@ -48,14 +51,38 @@ const App: React.FC = () => {
     },
   ]);
 
+  const { isLoggedIn } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [orderMessage, setOrderMessage] = useState('');
+  const [orderConfirmation, setOrderConfirmation] = useState<string | null>(null);
 
   const handleAddProduct = (product: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       ...product,
-      id: products.length + 1,
+      id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
     };
     setProducts(prevProducts => [...prevProducts, newProduct]);
+  };
+  
+  const handleDeleteProduct = (id: number) => {
+    if (!isLoggedIn) return;
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      setProducts(prevProducts => prevProducts.filter(p => p.id !== id));
+    }
+  };
+
+  const handleOrder = (productName: string, quantity: number) => {
+    if (quantity > 0) {
+      setOrderMessage(`I would like to order ${quantity}kg of ${productName}. Please provide further details.`);
+      setOrderConfirmation(`Thank you! Added ${quantity}kg of ${productName} to your inquiry. Scrolling to contact form...`);
+      
+      setTimeout(() => {
+        setOrderConfirmation(null);
+        document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+      }, 3000);
+    } else {
+      alert('Please enter a valid quantity.');
+    }
   };
 
   const filteredProducts = products.filter(
@@ -70,9 +97,15 @@ const App: React.FC = () => {
       <main>
         <Hero />
         <About />
-        <Products products={filteredProducts} onAddProduct={handleAddProduct} />
+        <Products 
+          products={filteredProducts} 
+          onAddProduct={handleAddProduct}
+          onDeleteProduct={handleDeleteProduct}
+          onOrder={handleOrder}
+          orderConfirmation={orderConfirmation}
+        />
         <Testimonials testimonials={testimonials} />
-        <Contact />
+        <Contact orderMessage={orderMessage} />
       </main>
       <Footer />
     </div>

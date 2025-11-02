@@ -1,15 +1,48 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PhoneIcon } from './icons/PhoneIcon';
 import { MailIcon } from './icons/MailIcon';
+import { db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
-export const Contact: React.FC = () => {
+export const Contact: React.FC<{ orderMessage?: string }> = ({ orderMessage }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (orderMessage) {
+      setMessage(orderMessage);
+    }
+  }, [orderMessage]);
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert("Thank you for your message! We will get back to you shortly.");
-    // In a real app, you would handle form submission here.
-    (e.target as HTMLFormElement).reset();
+    if (!name || !email || !message) {
+      alert('Please fill out all fields.');
+      return;
+    }
+    setIsSubmitting(true);
+
+    try {
+      await addDoc(collection(db, "contacts"), {
+        name,
+        email,
+        message,
+        submittedAt: new Date(),
+      });
+      alert("Thank you for your message! We've received your inquiry and will get back to you shortly.");
+      // Reset form
+      setName('');
+      setEmail('');
+      setMessage('');
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      alert("Sorry, there was an error sending your message. Please try again later or contact us directly via phone or email.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -41,17 +74,46 @@ export const Contact: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="contact-name" className="sr-only">Name</label>
-                <input type="text" id="contact-name" placeholder="Your Name" required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-green" />
+                <input 
+                  type="text" 
+                  id="contact-name" 
+                  placeholder="Your Name" 
+                  required 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-green" 
+                />
               </div>
               <div>
                 <label htmlFor="contact-email" className="sr-only">Email</label>
-                <input type="email" id="contact-email" placeholder="Your Email" required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-green" />
+                <input 
+                  type="email" 
+                  id="contact-email" 
+                  placeholder="Your Email" 
+                  required 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-green" 
+                />
               </div>
               <div>
                 <label htmlFor="contact-message" className="sr-only">Message</label>
-                <textarea id="contact-message" placeholder="Your Message" rows={4} required className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-green"></textarea>
+                <textarea 
+                  id="contact-message" 
+                  placeholder="Your Message" 
+                  rows={4} 
+                  required 
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-green"></textarea>
               </div>
-              <button type="submit" className="w-full bg-brand-green hover:bg-brand-green-dark text-white font-bold py-3 px-4 rounded-md transition-colors duration-300">Send Message</button>
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="w-full bg-brand-green hover:bg-brand-green-dark text-white font-bold py-3 px-4 rounded-md transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Sending...' : 'Send Message'}
+              </button>
             </form>
           </div>
         </div>
