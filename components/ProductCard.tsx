@@ -43,7 +43,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoggedIn, o
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform transform hover:-translate-y-2 duration-300 border border-gray-100 relative group">
+      <div className="bg-blue rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform transform hover:-translate-y-2 duration-300 border border-gray-100 relative group">
         {isLoggedIn && (
           <button 
             onClick={handleDeleteClick}
@@ -55,10 +55,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoggedIn, o
         )}
         <img src={product.imageUrl} alt={product.name} className="w-full h-56 object-cover" />
         <div className="p-6 flex flex-col flex-grow">
-          <h3 className="text-2xl font-semibold text-brand-brown mb-2">{product.name}</h3>
+          <h3 className="text-2xl font-semibold text-brand-secondary mb-2">{product.name}</h3>
           <p className="text-gray-600 mb-4 flex-grow">{product.description}</p>
           <div className="mt-auto">
-              <p className="text-xl font-bold text-brand-green mb-4">${product.price} / {product.priceUnit}</p>
+              <p className="text-xl font-bold text-brand-primary mb-4">${product.price} / {product.priceUnit}</p>
               <div className="mb-4">
                   <div className="flex items-center space-x-4">
                     <label htmlFor={`quantity-${product.id}`} className="font-medium text-gray-700">Qty (kg):</label>
@@ -69,7 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoggedIn, o
                       step="1"
                       value={quantity}
                       onChange={handleQuantityChange}
-                      className={`w-20 px-3 py-1 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:border-brand-green ${quantityError ? 'border-red-500 ring-red-500' : 'border-gray-300 ring-brand-green'}`}
+                      className={`w-20 px-3 py-1 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:border-brand-primary ${quantityError ? 'border-red-500 ring-red-500' : 'border-gray-300 ring-brand-primary'}`}
                       aria-invalid={!!quantityError}
                       aria-describedby={quantityError ? `quantity-error-${product.id}` : undefined}
                     />
@@ -80,7 +80,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, isLoggedIn, o
                       </p>
                   )}
               </div>
-              <button onClick={handleOrderClick} className="w-full text-center block bg-brand-green hover:bg-brand-green-dark text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">
+              <button onClick={handleOrderClick} className="w-full text-center block bg-brand-primary hover:bg-brand-primary-dark text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">
               Order Now
               </button>
           </div>
