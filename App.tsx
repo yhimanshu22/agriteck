@@ -92,7 +92,7 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="bg-white text-gray-800 font-sans">
+    <div className="bg-light text-gray-800 font-sans">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
       <main>
         <Hero />

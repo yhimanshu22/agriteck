@@ -1,8 +1,20 @@
+
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { auth } from './firebase'; // Make sure firebase.ts is in the same directory
+import { 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  onAuthStateChanged, 
+  signOut, 
+  User 
+} from 'firebase/auth';
 
 interface AuthContextType {
+  currentUser: User | null;
   isLoggedIn: boolean;
-  login: (password: string) => boolean;
+  loading: boolean;
+  error: string | null;
+  signInWithGoogle: () => void;
   logout: () => void;
 }
 
@@ -17,34 +29,59 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
-  // Hardcoded password for simplicity. In a real app, use a backend.
-  const ADMIN_PASSWORD = 'password123';
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const isLoggedIn = !!currentUser;
 
   useEffect(() => {
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          setIsLoggedIn(true);
-      }
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      setCurrentUser(user);
+      setLoading(false);
+    }, (error) => {
+      setError(error.message);
+      setLoading(false);
+    });
+    return unsubscribe;
   }, []);
 
-  const login = (password: string) => {
-    if (password === ADMIN_PASSWORD) {
-      setIsLoggedIn(true);
-      sessionStorage.setItem('isLoggedIn', 'true'); // Persist login state across reloads
-      return true;
+  const signInWithGoogle = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (error: any) { // Catch specific error type if known
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
-    return false;
   };
 
-  const logout = () => {
-    setIsLoggedIn(false);
-    sessionStorage.removeItem('isLoggedIn');
+  const logout = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await signOut(auth);
+    } catch (error: any) { // Catch specific error type if known
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const value = {
+    currentUser,
+    isLoggedIn,
+    loading,
+    error,
+    signInWithGoogle,
+    logout,
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

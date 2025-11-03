@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
 import { useAuth } from '../auth';
+import { Modal } from './Modal'; // Import the Modal component
 
 interface ProductsProps {
   products: Product[];
@@ -30,8 +31,8 @@ const AddProductForm: React.FC<{ onAddProduct: (product: Omit<Product, 'id'>) =>
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 mt-8">
-      <h3 className="text-2xl font-semibold text-brand-brown mb-6">Add New Product</h3>
+    <div className="p-2">
+      <h3 className="text-2xl font-semibold text-brand-brown mb-6 text-center">Add New Product</h3>
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">Product Name</label>
@@ -66,7 +67,7 @@ const AddProductForm: React.FC<{ onAddProduct: (product: Omit<Product, 'id'>) =>
 
 
 export const Products: React.FC<ProductsProps> = ({ products, onAddProduct, onDeleteProduct, onOrder, orderConfirmation }) => {
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { isLoggedIn } = useAuth();
 
   return (
@@ -109,15 +110,20 @@ export const Products: React.FC<ProductsProps> = ({ products, onAddProduct, onDe
         {isLoggedIn && (
             <div className="text-center mt-16">
                 <button 
-                    onClick={() => setShowAdminPanel(!showAdminPanel)}
+                    onClick={() => setIsAddModalOpen(true)}
                     className="bg-brand-brown text-white font-bold py-3 px-8 rounded-full text-lg transition-transform transform hover:scale-105 duration-300 shadow-lg"
                 >
-                    {showAdminPanel ? 'Close Admin Panel' : 'Add New Product'}
+                    Add New Product
                 </button>
-                {showAdminPanel && <AddProductForm onAddProduct={onAddProduct} onDone={() => setShowAdminPanel(false)} />}
             </div>
         )}
       </div>
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
+        <AddProductForm 
+          onAddProduct={onAddProduct} 
+          onDone={() => setIsAddModalOpen(false)} 
+        />
+      </Modal>
     </section>
   );
 };

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
-import { ChevronRightIcon } from './icons/ChevronRightIcon';
+import ChevronLeftIcon from './icons/ChevronLeftIcon';
+import ChevronRightIcon from './icons/ChevronRightIcon';
 
 const slides = [
   {
@@ -81,10 +81,10 @@ export const Hero: React.FC = () => {
 
       {/* Navigation Arrows */}
       <div className="absolute z-20 top-1/2 -translate-y-1/2 w-full flex justify-between px-4 sm:px-8">
-        <button onClick={prevSlide} aria-label="Previous slide" className="bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
+        <button onClick={prevSlide} aria-label="Previous slide" className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
           <ChevronLeftIcon className="h-6 w-6" />
         </button>
-        <button onClick={nextSlide} aria-label="Next slide" className="bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
+        <button onClick={nextSlide} aria-label="Next slide" className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50">
           <ChevronRightIcon className="h-6 w-6" />
         </button>
       </div>
@@ -96,8 +96,8 @@ export const Hero: React.FC = () => {
             key={slideIndex}
             onClick={() => goToSlide(slideIndex)}
             className={`w-3 h-3 rounded-full transition-colors ${
-              currentSlide === slideIndex ? 'bg-white' : 'bg-white/50 hover:bg-white/75'
-            }`}
+              currentSlide === slideIndex ? 'bg-white' : 'bg-white/50'
+            } hover:bg-white`}
             aria-label={`Go to slide ${slideIndex + 1}`}
           ></button>
         ))}
